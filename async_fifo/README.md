@@ -13,6 +13,51 @@ A parameterizable SystemVerilog asynchronous FIFO for safely transferring data b
 - Reference queue for checking FIFO ordering and data integrity
 - Tests for reset behavior, full/empty boundaries, CDC latency, and mixed traffic
 
+## Architecture at a Glance
+
+![Asynchronous FIFO CDC architecture](docs/async_fifo_architecture.svg)
+
+The write and read pointers remain in their own clock domains. Only Gray-coded pointer values cross the boundary through synchronizers; the memory data path remains separate.
+
+```mermaid
+flowchart LR
+  W[Write domain<br/>wr_clk] --> WB[Binary write pointer]
+  WB --> WG[Binary to Gray]
+  WG --> WS[2-flop synchronizer]
+  WS --> RE[Read-domain empty logic]
+
+  R[Read domain<br/>rd_clk] --> RB[Binary read pointer]
+  RB --> RG[Binary to Gray]
+  RG --> RS[2-flop synchronizer]
+  RS --> WF[Write-domain full logic]
+
+  WB --> M[(Dual-port memory)]
+  M --> RB
+```
+
+## Pointer and Flag Flow
+
+```mermaid
+sequenceDiagram
+  participant W as Write domain
+  participant S as Gray synchronizer
+  participant R as Read domain
+
+  W->>W: Increment binary write pointer
+  W->>W: Convert pointer to Gray code
+  W->>S: Cross Gray write pointer
+  S->>R: Present synchronized write pointer
+  R->>R: Compare with read pointer
+  R-->>R: Update rd_empty conservatively
+
+  R->>R: Increment binary read pointer
+  R->>R: Convert pointer to Gray code
+  R->>S: Cross Gray read pointer
+  S->>W: Present synchronized read pointer
+  W->>W: Compare next write pointer
+  W-->>W: Update wr_full conservatively
+```
+
 ## Why Use an Asynchronous FIFO?
 
 An asynchronous FIFO decouples a producer and consumer that run on unrelated clocks. The write side accepts data using `wr_clk`, while the read side removes data using `rd_clk`. Neither clock is required to have a fixed phase or frequency relationship with the other.
@@ -160,6 +205,25 @@ gtkwave async_fifo_tb.vcd
 ### Current Simulation Status
 
 The RTL and testbench compile with Icarus Verilog, but the current regression reports read-data mismatches. The memory model uses a combinational read, while the testbench samples `rd_data` after the read pointer has already advanced. That timing can make the first observed value look like the following FIFO entry. The read task and read-data contract should be aligned before treating the regression as passing.
+
+## Waveform Signals to Inspect
+
+When viewing the generated VCD in GTKWave, start with these signals:
+
+| Signal | Domain | What to observe |
+| --- | --- | --- |
+| `wr_clk` | Write | Source clock for writes and write pointer updates |
+| `rd_clk` | Read | Source clock for reads and read pointer updates |
+| `wr_gray_ptr` | Write | Local Gray-coded write pointer |
+| `rd_gray_ptr` | Read | Local Gray-coded read pointer |
+| `wr_gray_sync` | Read | Synchronized write pointer |
+| `rd_gray_sync` | Write | Synchronized read pointer |
+| `wr_full` | Write | Write-side backpressure flag |
+| `rd_empty` | Read | Read-side no-data flag |
+| `wr_addr` / `rd_addr` | Local | Memory addresses selected by each side |
+| `wr_en` / `rd_en` | Local | Accepted operation requests |
+
+The synchronized pointers should change later than their source-domain pointers. That delay is expected and is the visual signature of the two-flop CDC path.
 
 ## Verification Strategy
 

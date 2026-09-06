@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="430" viewBox="0 0 1000 430" role="img" aria-labelledby="title desc">
+  <title id="title">Asynchronous FIFO CDC architecture</title>
+  <desc id="desc">Write and read clock domains connected through Gray-code pointer synchronizers and dual-port memory.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .domain { fill: #f8fafc; stroke: #64748b; stroke-width: 2; }
+      .block { fill: #dbeafe; stroke: #2563eb; stroke-width: 2; }
+      .sync { fill: #dcfce7; stroke: #16a34a; stroke-width: 2; }
+      .memory { fill: #fef3c7; stroke: #d97706; stroke-width: 2; }
+      .label { fill: #0f172a; font: 16px Arial, sans-serif; text-anchor: middle; }
+      .small { fill: #334155; font: 13px Arial, sans-serif; text-anchor: middle; }
+      .line { stroke: #334155; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+      .dashed { stroke-dasharray: 7 5; }
+    </style>
+  </defs>
+
+  <rect x="20" y="25" width="280" height="360" rx="12" class="domain"/>
+  <rect x="700" y="25" width="280" height="360" rx="12" class="domain"/>
+  <text x="160" y="58" class="label">Write clock domain</text>
+  <text x="840" y="58" class="label">Read clock domain</text>
+  <text x="160" y="80" class="small">wr_clk</text>
+  <text x="840" y="80" class="small">rd_clk</text>
+
+  <rect x="65" y="115" width="190" height="58" rx="8" class="block"/>
+  <text x="160" y="140" class="label">Binary write pointer</text>
+  <text x="160" y="160" class="small">address + wrap bit</text>
+
+  <rect x="65" y="220" width="190" height="58" rx="8" class="block"/>
+  <text x="160" y="245" class="label">Gray write pointer</text>
+  <text x="160" y="265" class="small">binary ^ (binary >> 1)</text>
+
+  <rect x="745" y="115" width="190" height="58" rx="8" class="block"/>
+  <text x="840" y="140" class="label">Binary read pointer</text>
+  <text x="840" y="160" class="small">address + wrap bit</text>
+
+  <rect x="745" y="220" width="190" height="58" rx="8" class="block"/>
+  <text x="840" y="245" class="label">Gray read pointer</text>
+  <text x="840" y="265" class="small">binary ^ (binary >> 1)</text>
+
+  <rect x="390" y="165" width="220" height="100" rx="10" class="memory"/>
+  <text x="500" y="202" class="label">Dual-port memory</text>
+  <text x="500" y="225" class="small">write on wr_clk</text>
+  <text x="500" y="245" class="small">read on rd_clk</text>
+
+  <rect x="350" y="55" width="300" height="58" rx="8" class="sync"/>
+  <text x="500" y="80" class="label">2-flop Gray synchronizers</text>
+  <text x="500" y="100" class="small">one per destination domain</text>
+
+  <path d="M160 173 L160 220" class="line"/>
+  <path d="M160 278 L390 215" class="line"/>
+  <path d="M840 173 L840 220" class="line"/>
+  <path d="M840 278 L610 215" class="line"/>
+  <path d="M255 249 C330 249 325 84 350 84" class="line dashed"/>
+  <path d="M745 249 C670 249 675 84 650 84" class="line dashed"/>
+  <path d="M350 84 C300 84 280 220 255 220" class="line dashed"/>
+  <path d="M650 84 C700 84 720 220 745 220" class="line dashed"/>
+
+  <text x="500" y="330" class="label">Flags stay local</text>
+  <text x="500" y="352" class="small">wr_full compares synchronized read pointer</text>
+  <text x="500" y="372" class="small">rd_empty compares synchronized write pointer</text>
+</svg>
