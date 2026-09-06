@@ -1,0 +1,10 @@
+# Simulation build artifacts
+async_fifo_sim
+sync_fifo_sim
+*.vcd
+*.vvp
+
+# Editor and OS files
+.vscode/
+.DS_Store
+Thumbs.db
