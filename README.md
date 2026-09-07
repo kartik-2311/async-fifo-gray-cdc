@@ -15,7 +15,7 @@ A parameterizable SystemVerilog asynchronous FIFO for safely transferring data b
 
 ## Architecture at a Glance
 
-![Asynchronous FIFO CDC architecture](docs/async_fifo_architecture.svg)
+docs/async_fifo_architecture.svg
 
 The write and read pointers remain in their own clock domains. Only Gray-coded pointer values cross the boundary through synchronizers; the memory data path remains separate.
 
