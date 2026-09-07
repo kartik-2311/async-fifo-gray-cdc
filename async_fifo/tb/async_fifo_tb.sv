@@ -1,7 +1,6 @@
 // ============================================================================
 // Project     : FIFO Portfolio – Part 2: Asynchronous FIFO (CDC)
 // File        : async_fifo_tb.sv
-// Author      : [Your Name]
 // Date        : 2026-09-04
 // Description : Self-checking testbench for parameterizable Asynchronous FIFO
 //
