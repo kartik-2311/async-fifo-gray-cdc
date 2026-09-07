@@ -15,6 +15,7 @@ A parameterizable SystemVerilog asynchronous FIFO for safely transferring data b
 
 ## Architecture at a Glance
 
+![Asynchronous FIFO CDC architecture](docs/async_fifo_architecture.svg)
 
 The write and read pointers remain in their own clock domains. Only Gray-coded pointer values cross the boundary through synchronizers; the memory data path remains separate.
 
@@ -209,18 +210,18 @@ The RTL and testbench compile with Icarus Verilog, but the current regression re
 
 When viewing the generated VCD in GTKWave, start with these signals:
 
-| Signal | Domain | What to observe |
-| --- | --- | --- |
-| `wr_clk` | Write | Source clock for writes and write pointer updates |
-| `rd_clk` | Read | Source clock for reads and read pointer updates |
-| `wr_gray_ptr` | Write | Local Gray-coded write pointer |
-| `rd_gray_ptr` | Read | Local Gray-coded read pointer |
-| `wr_gray_sync` | Read | Synchronized write pointer |
-| `rd_gray_sync` | Write | Synchronized read pointer |
-| `wr_full` | Write | Write-side backpressure flag |
-| `rd_empty` | Read | Read-side no-data flag |
-| `wr_addr` / `rd_addr` | Local | Memory addresses selected by each side |
-| `wr_en` / `rd_en` | Local | Accepted operation requests |
+| Signal                    | Domain | What to observe                                   |
+| ------------------------- | ------ | ------------------------------------------------- |
+| `wr_clk`                | Write  | Source clock for writes and write pointer updates |
+| `rd_clk`                | Read   | Source clock for reads and read pointer updates   |
+| `wr_gray_ptr`           | Write  | Local Gray-coded write pointer                    |
+| `rd_gray_ptr`           | Read   | Local Gray-coded read pointer                     |
+| `wr_gray_sync`          | Read   | Synchronized write pointer                        |
+| `rd_gray_sync`          | Write  | Synchronized read pointer                         |
+| `wr_full`               | Write  | Write-side backpressure flag                      |
+| `rd_empty`              | Read   | Read-side no-data flag                            |
+| `wr_addr` / `rd_addr` | Local  | Memory addresses selected by each side            |
+| `wr_en` / `rd_en`     | Local  | Accepted operation requests                       |
 
 The synchronized pointers should change later than their source-domain pointers. That delay is expected and is the visual signature of the two-flop CDC path.
 
